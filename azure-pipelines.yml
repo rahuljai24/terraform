@@ -1,0 +1,39 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- Dev
+
+pool:
+  name: Azure Pipelines
+  vmImage: windows-2019
+
+steps:
+- task: TerraformInstaller@0
+  inputs:
+    terraformVersion: 'latest'
+- task: TerraformTaskV2@2
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/mainvm.tf'
+    backendServiceArm: 'Azure'
+    backendAzureRmResourceGroupName: 'terraform'
+    backendAzureRmStorageAccountName: 'terraformstor2022'
+    backendAzureRmContainerName: 'terraformcontainer'
+    backendAzureRmKey: 'AGd9aQGs38I2KghGSeooIhUfTAIVxAPkfaIODubFtGk8ZCNPBlPgSeFWUVLr44Osl4mDACy533g9N44DElZmTg=='
+
+- task: TerraformTaskV2@2
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    environmentServiceNameAzureRM: 'Azure'
+
+- task: TerraformTaskV2@2
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/mainvm.tf'
+    environmentServiceNameAzureRM: 'Azure'
